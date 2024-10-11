@@ -3400,11 +3400,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/shinji/Escritorio/Projects/Enrollment-Management-System-UNSA/enrollments-microservice/src/src.csproj",
+      "projectUniqueName": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/src/src.csproj",
       "projectName": "src",
-      "projectPath": "/home/shinji/Escritorio/Projects/Enrollment-Management-System-UNSA/enrollments-microservice/src/src.csproj",
+      "projectPath": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/src/src.csproj",
       "packagesPath": "/home/shinji/.nuget/packages/",
-      "outputPath": "/home/shinji/Escritorio/Projects/Enrollment-Management-System-UNSA/enrollments-microservice/src/obj/",
+      "outputPath": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/src/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/shinji/.nuget/NuGet/NuGet.Config"
