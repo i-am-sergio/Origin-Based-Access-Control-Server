@@ -2409,11 +2409,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/shinji/Escritorio/Projects/Enrollment-Management-System-UNSA/enrollments-microservice/test/test.csproj",
+      "projectUniqueName": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/test/test.csproj",
       "projectName": "test",
-      "projectPath": "/home/shinji/Escritorio/Projects/Enrollment-Management-System-UNSA/enrollments-microservice/test/test.csproj",
+      "projectPath": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/test/test.csproj",
       "packagesPath": "/home/shinji/.nuget/packages/",
-      "outputPath": "/home/shinji/Escritorio/Projects/Enrollment-Management-System-UNSA/enrollments-microservice/test/obj/",
+      "outputPath": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/test/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/shinji/.nuget/NuGet/NuGet.Config"
@@ -2428,8 +2428,8 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "projectReferences": {
-            "/home/shinji/Escritorio/Projects/Enrollment-Management-System-UNSA/enrollments-microservice/src/src.csproj": {
-              "projectPath": "/home/shinji/Escritorio/Projects/Enrollment-Management-System-UNSA/enrollments-microservice/src/src.csproj"
+            "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/src/src.csproj": {
+              "projectPath": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/src/src.csproj"
             }
           }
         }
