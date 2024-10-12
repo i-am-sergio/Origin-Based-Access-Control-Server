@@ -86,473 +86,162 @@ El microservicio de matrículas se encarga de gestionar todos los aspectos relac
 
 ## 3. Pruebas
 
-### 3.1. Pruebas de API
+### 3.1 Pruebas de Seguridad
 
-#### 3.1.1. Herramientas y Tecnologías
+#### 3.1.1 Herramientas y Tecnologías
 
-Para llevar a cabo las pruebas de nuestra API, hemos utilizado una serie de herramientas y tecnologías clave que facilitan la evaluación exhaustiva y efectiva de las funcionalidades expuestas por la API. A continuación se describen las herramientas principales empleadas:
+**OWASP ZAP (Zed Attack Proxy)** es una herramienta de código abierto diseñada para realizar pruebas de seguridad en aplicaciones web. Desarrollada por el Open Web Application Security Project (OWASP), ZAP proporciona una amplia gama de funciones para identificar vulnerabilidades y evaluar la seguridad de aplicaciones durante el ciclo de desarrollo. Su interfaz intuitiva permite a los usuarios realizar escaneos automatizados, así como llevar a cabo pruebas manuales de seguridad, como la exploración de aplicaciones y la identificación de puntos débiles. ZAP es particularmente útil para detectar problemas de seguridad comunes, como inyecciones SQL, ataques de cross-site scripting (XSS) y configuraciones incorrectas. Además, ZAP ofrece soporte para integraciones con otras herramientas de desarrollo y pruebas, lo que facilita la inclusión de prácticas de seguridad en el proceso de desarrollo ágil. Su capacidad para generar reportes detallados ayuda a los equipos de desarrollo a abordar las vulnerabilidades de manera efectiva y mejorar la seguridad general de sus aplicaciones.
 
-- **Postman:** Esta herramienta es ampliamente utilizada para el diseño, prueba y documentación de APIs. Permite realizar solicitudes HTTP a los endpoints de la API, definir y gestionar colecciones de pruebas, y verificar respuestas con gran detalle. Postman también proporciona funcionalidades avanzadas como la ejecución de scripts pre y post solicitud, así como la integración con sistemas de CI/CD para automatizar las pruebas.
-
-- **Swagger:** Swagger, ahora conocido como OpenAPI, es una herramienta poderosa para documentar y probar APIs. Permite generar documentación interactiva que facilita la comprensión y el uso de los endpoints de la API. Con Swagger, es posible visualizar y probar los endpoints directamente desde la documentación, lo que ayuda a identificar problemas y validar el comportamiento de la API de manera eficiente.
-
-Estas herramientas y tecnologías no solo facilitan la creación de pruebas detalladas y la generación de documentación precisa, sino que también aseguran una integración continua y una experiencia de usuario consistente durante el ciclo de vida de desarrollo de la API.
-
-#### 3.1.2. Escenarios de Prueba de API
-
-En esta sección se detallan los escenarios de prueba para el servicio de matrículas, los cuales han sido diseñados para validar el correcto funcionamiento de las diferentes operaciones del API. Los detalles de los escenarios de prueba están disponibles en el archivo `enrollments-microservice.postman_collection.json`, el cual contiene las solicitudes y configuraciones para ejecutar los tests en Postman.
-
-Además, los resultados de la ejecución de estos tests se encuentran en el archivo `enrollments-microservice.postman_test_run.json`. Este archivo proporciona un resumen de las pruebas realizadas y los resultados obtenidos, facilitando la verificación del comportamiento esperado del API según los casos de prueba definidos.
-
-<details open>
-  <summary><b><i>Crear matrícula</i></b></summary>
+#### 3.1.2 Escenarios de Prueba de Seguridad
 
 ```gherkin
 Background:
-    Given que el endpoint "/api/v1/Enrollments/enroll/{userId}/{schoolId}" está accesible
+    Given que el endpoint "http://localhost:8004" está accesible
 ```
 
-  <details open>
-    <summary><b><i>Escenario 1:</i></b> Crear matrícula con éxito</summary>
+<details open>
+  <summary><b><i>Escenario 1:</i></b> Verificación de encabezados de seguridad HTTP.</summary>
 
 ```gherkin
-    Given que el sistema contiene un usuario con ID "1" y créditos suficientes
-    And el sistema contiene una escuela con ID "1" con el cuerpo:
-    {
-        "courses": [
-        {"id": "course1", "group": "A"}
-        ]
-    }
-    When envíe una solicitud POST a "/api/v1/Enrollments/enroll/1/1"
-    Then el código de estado de la respuesta debe ser 201
-    And el cuerpo de la respuesta debe contener "Enrollment created successfully"
+Scenario: Verificación de encabezados de seguridad HTTP
+  Given el sitio web "http://localhost:8004" debe incluir varios encabezados de seguridad HTTP
+  When se realiza un análisis de encabezados HTTP
+  Then los encabezados esperados deben estar presentes, incluyendo "Strict-Transport-Security", "Content-Security-Policy", y "X-Content-Type-Options"
 ```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 2:</i></b> Crear matrícula cuando el usuario no existe</summary>
-
-```gherkin
-  Given el sistema no contiene un usuario con ID "999" con el cuerpo:
-    {
-      "courses": [
-        {"id": "1", "group": "A"},
-        {"id": "3", "group": "B"}
-      ]
-    }
-  When se envía una solicitud POST a "/api/v1/Enrollments/enroll/999/1"
-  Then el código de estado de la respuesta debe ser 404
-  And el cuerpo de la respuesta debe contener "User not found"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 3:</i></b> Crear matrícula cuando el usuario tiene créditos insuficientes</summary>
-
-```gherkin
-    Given que el sistema contiene un usuario con ID "1" pero con créditos insuficientes
-    And el sistema contiene una escuela con ID "1" con el cuerpo:
-    {
-        "courses": [
-        {"id": "1", "group": "A"},
-        {"id": "3", "group": "B"}
-        ]
-    }
-    When envíe una solicitud POST a "/api/v1/Enrollments/enroll/1/1"
-    Then el código de estado de la respuesta debe ser 400
-    And el cuerpo de la respuesta debe contener "Insufficient credits"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 4:</i></b> Crear matrícula cuando la escuela no existe</summary>
-
-```gherkin
-    Given que el sistema contiene un usuario con ID "1" y créditos suficientes
-    And el sistema no contiene una escuela con ID "999" con el cuerpo:
-    {
-        "courses": [
-        {"id": "1", "group": "A"},
-        {"id": "3", "group": "B"}
-        ]
-    }
-    When envíe una solicitud POST a "/api/v1/Enrollments/enroll/1/999"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "School not found"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 5:</i></b> Crear matrícula cuando los cursos están vacíos</summary>
-
-```gherkin
-    Given que el sistema contiene un usuario con ID "1" y créditos suficientes
-    And el sistema no contiene una escuela con ID "1" con el cuerpo:
-    {
-        "courses": []
-    }
-    When envíe una solicitud POST a "/api/v1/Enrollments/enroll/1/1"
-    Then el código de estado de la respuesta debe ser 400
-    And el cuerpo de la respuesta debe contener "No courses to enroll"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 6:</i></b> Crear matrícula cuando el ID del curso no existe</summary>
-
-```gherkin
-    Given que el sistema contiene un usuario con ID "1" y créditos suficientes
-    And el sistema contiene una escuela con ID "1" con el cuerpo:
-    {
-        "courses": [
-        {"id": "course999", "group": "A"},
-        {"id": "course3", "group": "B"}
-        ]
-    }
-    When envíe una solicitud POST a "/api/v1/Enrollments/enroll/1/1"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "Course not found or credits missing"
-```
-
-  </details>
 
 </details>
 
 <details open>
-<summary><b><i>Obtener detalles de la matrícula</i></b></summary>
+  <summary><b><i>Escenario 2:</i></b> Verificación de vulnerabilidades en bibliotecas JavaScript.</summary>
 
 ```gherkin
-Background:
-    Given el endpoint "/api/v1/Enrollments/{id}" está accesible
+Scenario: Verificación de vulnerabilidades en bibliotecas JavaScript
+  Given el sitio web "http://localhost:8004" utiliza bibliotecas JavaScript de terceros
+  When se realiza un análisis de bibliotecas JavaScript
+  Then no se deben encontrar bibliotecas vulnerables, como aquellas indicadas por Retire.js
 ```
-
-  <details open>
-    <summary><b><i>Escenario 1:</i></b> Obtener detalles de la matrícula con éxito</summary>
-
-```gherkin
-    Given el sistema contiene una matrícula con ID "1"
-    When se envía una solicitud GET a "/api/v1/Enrollments/1"
-    Then el código de estado de la respuesta debe ser 200
-    And el cuerpo de la respuesta debe contener los detalles de la matrícula con ID "1"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 2:</i></b> Obtener detalles de la matrícula cuando no existe</summary>
-
-```gherkin
-        Given el sistema no contiene una matrícula con ID "999"
-    When se envía una solicitud GET a "/api/v1/Enrollments/999"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener un mensaje de error "Not Found"
-```
-
-  </details>
 
 </details>
 
 <details open>
-    <summary><b><i>Actualizar matrícula</i></b></summary>
+  <summary><b><i>Escenario 3:</i></b> Verificación de la configuración de cookies.</summary>
 
 ```gherkin
-Background:
-    Given el endpoint "/api/v1/Enrollments/enroll/{enrollId}" está accesible
+Scenario: Verificación de la configuración de cookies
+  Given el sitio web "http://localhost:8004" utiliza cookies para el manejo de sesiones
+  When se realiza un análisis de cookies
+  Then todas las cookies deben estar configuradas con las banderas adecuadas, incluyendo "HttpOnly" y "Secure"
 ```
-
-  <details open>
-    <summary><b><i>Escenario 1:</i></b> Actualizar matrícula con éxito</summary>
-
-```gherkin
-    Given el sistema contiene una matrícula con ID "0" con el cuerpo:
-    {
-        "studentId": "1",
-        "schoolId": "1",
-        "fullName": "Shinji Ikari",
-        "academicPerformance": 0,
-        "credits": 28,
-        "courses": [
-            {"id": "1", "group": "A"},
-            {"id": "3", "group": "C"}
-        ],
-        "schoolName": "Evangelion"
-    }
-    When se envía una solicitud PUT a "/api/v1/Enrollments/enroll/0"
-    Then el código de estado de la respuesta debe ser 200
-    And el cuerpo de la respuesta debe contener "Enroll updated successfully"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 2:</i></b> Actualizar matrícula cuando no existe</summary>
-
-```gherkin
-    Given el sistema no contiene una matrícula con ID "999" con el cuerpo:
-    {
-        "studentId": "1",
-        "schoolId": "1",
-        "fullName": "Shinji Ikari",
-        "academicPerformance": 0,
-        "credits": 28,
-        "courses": [
-            {"id": "1", "group": "A"},
-            {"id": "3", "group": "C"}
-        ],
-        "schoolName": "Evangelion"
-    }
-    When se envía una solicitud PUT a "/api/v1/Enrollments/enroll/999"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "Enroll not found"
-```
-
-  </details>
 
 </details>
 
 <details open>
-    <summary><b><i>Eliminar matrícula</i></b></summary>
+  <summary><b><i>Escenario 4:</i></b> Verificación de la protección contra ataques XSS.</summary>
 
 ```gherkin
-Background:
-    Given el endpoint "/api/v1/Enrollments/enroll/{enrollId}" está accesible
+Scenario: Verificación de la protección contra ataques XSS
+  Given el sitio web "http://localhost:8004" permite la entrada de usuarios
+  When se realiza un análisis de entrada para detectar vulnerabilidades XSS
+  Then no se deben encontrar puntos de entrada vulnerables a ataques de cross-site scripting (XSS)
 ```
-
-  <details open>
-    <summary><b><i>Escenario 1:</i></b> Eliminar matrícula con éxito</summary>
-
-```gherkin
-    Given el sistema contiene una matrícula con ID "1"
-    When se envía una solicitud DELETE a "/api/v1/Enrollments/enroll/1"
-    Then el código de estado de la respuesta debe ser 200
-    And el cuerpo de la respuesta debe contener "Enrollment deleted successfully"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 2:</i></b> Eliminar matrícula cuando no existe</summary>
-
-```gherkin
-    Given el sistema no contiene una matrícula con ID "999"
-    When se envía una solicitud DELETE a "/api/v1/Enrollments/enroll/999"
-    Then el código de estado de la respuesta debe ser 400
-    And el cuerpo de la respuesta debe contener "Enrollment not found"
-```
-
-  </details>
 
 </details>
 
 <details open>
-    <summary><b><i>Obtener cursos disponibles</i></b></summary>
+  <summary><b><i>Escenario 5:</i></b> Verificación de la política de seguridad de contenido (CSP).</summary>
 
 ```gherkin
-Background:
-    Given el endpoint "/api/v1/Enrollments/available/{userId}/{schoolId}" está accesible
+Scenario: Verificación de la política de seguridad de contenido (CSP)
+  Given el sitio web "http://localhost:8004" debe tener una política de seguridad de contenido configurada
+  When se realiza un análisis de la política de seguridad de contenido
+  Then la política debe estar correctamente configurada y debe incluir directivas como "default-src" y "script-src"
 ```
-
-  <details open>
-    <summary><b><i>Escenario 1:</i></b> Obtener cursos disponibles con éxito</summary>
-
-```gherkin
-    Given el sistema contiene un usuario con ID "1" y una escuela con ID "1"
-    And el usuario ha completado los cursos con IDs "1" y "2"
-    And la escuela tiene una malla con cursos que requieren los IDs "1" y "2"
-    And hay cursos disponibles con ID "3" que no han sido completados por el usuario
-    When se envía una solicitud GET a "/api/v1/Enrollments/available/1/1"
-    Then el código de estado de la respuesta debe ser 200
-    And el cuerpo de la respuesta debe contener una lista de cursos disponibles con ID "3"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 2:</i></b> Obtener cursos disponibles cuando el usuario no existe</summary>
-
-```gherkin
-    Given el sistema no contiene un usuario con ID "999"
-    When se envía una solicitud GET a "/api/v1/Enrollments/available/999/1"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "User not found"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 3:</i></b> Obtener cursos disponibles cuando la escuela no existe</summary>
-
-```gherkin
-    Given el sistema contiene un usuario con ID "1"
-    And el sistema no contiene una escuela con ID "999"
-    When se envía una solicitud GET a "/api/v1/Enrollments/available/1/999"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "School not found"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 4:</i></b> Obtener cursos disponibles cuando no hay cursos disponibles</summary>
-
-```gherkin
-    Given el sistema contiene un usuario con ID "1"
-    And la escuela tiene una malla con cursos que han sido completados por el usuario
-    When se envía una solicitud GET a "/api/v1/Enrollments/available/1/1"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "No courses available"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 5:</i></b> Obtener cursos disponibles cuando los cursos no existen</summary>
-
-```gherkin
-    Given el sistema contiene un usuario con ID "1"
-    And la escuela tiene una malla con cursos que requieren los IDs "1" y "2"
-    And el curso de ID “4” no tiene horarios registrados
-    When se envía una solicitud GET a "/api/v1/Enrollments/available/1/1"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "Course not found"
-```
-
-  </details>
 
 </details>
 
 <details open>
-    <summary><b><i>Obtener matrículas por ID de usuario</i></b></summary>
+  <summary><b><i>Escenario 6:</i></b> Verificación de la protección contra el clickjacking.</summary>
 
 ```gherkin
-Background:
-    Given el endpoint "/api/v1/Enrollments/user/{userId}" está accesible
+Scenario: Verificación de la protección contra el clickjacking
+  Given el sitio web "http://localhost:8004" debe protegerse contra ataques de clickjacking
+  When se realiza un análisis de encabezados HTTP
+  Then debe estar presente el encabezado "X-Frame-Options" con una configuración segura
 ```
-
-  <details open>
-    <summary><b><i>Escenario 1:</i></b> Obtener matrículas por ID de usuario con éxito</summary>
-
-```gherkin
-    Given el sistema contiene matrículas asociadas al usuario con ID "1"
-    When se envía una solicitud GET a "/api/v1/Enrollments/user/1"
-    Then el código de estado de la respuesta debe ser 200
-    And el cuerpo de la respuesta debe contener una lista de matrículas para el usuario con ID "1"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 2:</i></b> Obtener matrículas por ID de usuario cuando el usuario no existe</summary>
-
-```gherkin
-    Given el sistema no contiene matrículas asociadas al usuario con ID "999"
-    When se envía una solicitud GET a "/api/v1/Enrollments/user/999"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "User not found"
-```
-
-  </details>
 
 </details>
 
 <details open>
-    <summary><b><i>Obtener matrículas por ID de escuela</i></b></summary>
+  <summary><b><i>Escenario 7:</i></b> Verificación de redirecciones abiertas.</summary>
 
 ```gherkin
-Background:
-    Given el endpoint "/api/v1/Enrollments/school/{schoolId}" está accesible
+Scenario: Verificación de redirecciones abiertas
+  Given el sitio web "http://localhost:8004" debe manejar las redirecciones de forma segura
+  When se realiza un análisis para detectar redirecciones abiertas
+  Then no deben encontrarse vulnerabilidades de redirección abierta
 ```
-
-  <details open>
-    <summary><b><i>Escenario 1:</i></b> Obtener matrículas por ID de escuela con éxito</summary>
-
-```gherkin
-    Given el sistema contiene matrículas asociadas a la escuela con ID "1"
-    When se envía una solicitud GET a "/api/v1/Enrollments/school/1"
-    Then el código de estado de la respuesta debe ser 200
-    And el cuerpo de la respuesta debe contener una lista de matrículas para la escuela con ID "1"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 2:</i></b> Obtener matrículas por ID de escuela cuando la escuela no existe</summary>
-
-```gherkin
-    Given el sistema no contiene matrículas asociadas a la escuela con ID "999"
-    When se envía una solicitud GET a "/api/v1/Enrollments/school/999"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "School not found"
-```
-
-  </details>
 
 </details>
 
 <details open>
-    <summary><b><i>Obtener matrículas por ID de usuario y ID de escuela</i></b></summary>
+  <summary><b><i>Escenario 8:</i></b> Verificación de exposición de información sensible.</summary>
 
 ```gherkin
-Background:
-    Given el endpoint "/api/v1/Enrollments/certificate/{userId}/{schoolId}" está accesible
+Scenario: Verificación de exposición de información sensible
+  Given el sitio web "http://localhost:8004" debe proteger la información sensible
+  When se realiza un análisis para detectar la exposición de información sensible
+  Then no se debe encontrar información sensible expuesta en encabezados HTTP o mensajes de error
 ```
-
-  <details open>
-    <summary><b><i>Escenario 1:</i></b> Obtener matrículas por ID de usuario y ID de escuela con éxito</summary>
-
-```gherkin
-    Given el sistema contiene las matrículas para el usuario con ID "1" en la escuela con ID "1"
-    When se envía una solicitud GET a "/api/v1/Enrollments/certificate/1/1"
-    Then el código de estado de la respuesta debe ser 200
-    And el cuerpo de la respuesta debe contener una lista de matrículas para el usuario con ID "1" en la escuela con ID "1"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 2:</i></b> Obtener matrícula por ID de usuario y ID de escuela cuando la escuela no existe</summary>
-
-```gherkin
-    Given el sistema no contiene una inscripción para el usuario con ID "1" en la escuela con ID "999"
-    When se envía una solicitud GET a "/api/v1/Enrollments/certificate/1/999"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "School not found"
-```
-
-  </details>
-
-  <details open>
-    <summary><b><i>Escenario 3:</i></b> Obtener matrícula por ID de usuario y ID de escuela cuando el usuario no existe</summary>
-
-```gherkin
-    Given el sistema no contiene una inscripción para el usuario con ID "999" en la escuela con ID "1"
-    When se envía una solicitud GET a "/api/v1/Enrollments/certificate/999/1"
-    Then el código de estado de la respuesta debe ser 404
-    And el cuerpo de la respuesta debe contener "User not found"
-```
-
-  </details>
 
 </details>
 
-#### 3.1.3. Pruebas de API con Swagger
+<details open>
+  <summary><b><i>Escenario 9:</i></b> Verificación de configuraciones de seguridad en la administración de sesiones.</summary>
 
-Swagger facilita la comprensión de los endpoints disponibles y cómo interactuar con ellos. Además, se incluye información sobre el archivo `requests/enroll.http`, que contiene los comandos cURL necesarios para ejecutar las pruebas de la API de manera eficiente. Este archivo permite realizar las solicitudes directamente desde la línea de comandos, complementando el uso de Swagger para una experiencia de prueba completa.
+```gherkin
+Scenario: Verificación de configuraciones de seguridad en la administración de sesiones
+  Given el sitio web "http://localhost:8004" gestiona sesiones de usuario
+  When se realiza un análisis de la gestión de sesiones
+  Then la sesión debe estar protegida contra ataques como el secuestro de sesión y el manejo inseguro de IDs de sesión
+```
 
-![](resources/swagger.png)
+</details>
 
-### 3.2. Pruebas de Rendimiento
+<details open>
+  <summary><b><i>Escenario 10:</i></b> Verificación de la protección contra ataques de CSRF.</summary>
 
-#### 3.2.1. Herramientas y Tecnologías
+```gherkin
+Scenario: Verificación de la protección contra ataques de CSRF
+  Given el sitio web "http://localhost:8004" debe protegerse contra ataques de falsificación de solicitudes entre sitios (CSRF)
+  When se realiza un análisis para detectar la protección contra CSRF
+  Then deben encontrarse y validarse tokens anti-CSRF en formularios y solicitudes
+```
+
+</details>
+
+<details open>
+  <summary><b><i>Escenario 11:</i></b> Verificación de vulnerabilidades de exposición de información.</summary>
+
+```gherkin
+Scenario: Verificación de vulnerabilidades de exposición de información
+  Given el sitio web "http://localhost:8004" debe manejar la exposición de información con cuidado
+  When se realiza un análisis para detectar la divulgación de información sensible
+  Then no deben encontrarse vulnerabilidades de divulgación de información, como mensajes de error o encabezados de respuesta que revelen detalles internos
+```
+
+</details>
+
+<p align="center">
+  <img src="resources/security_test.png" alt="Performance Test" />
+</p>
+
+### 3.2 Pruebas de Rendimiento
+
+#### 3.2.1 Herramientas y Tecnologías
 
 **Apache JMeter** es una herramienta de código abierto ampliamente utilizada para realizar pruebas de rendimiento y carga en aplicaciones. Diseñada para evaluar el rendimiento de servicios web y aplicaciones en una variedad de protocolos, JMeter permite simular múltiples usuarios concurrentes para medir el comportamiento del sistema bajo diferentes cargas. Con su interfaz gráfica intuitiva, JMeter facilita la creación de planes de prueba personalizados, la definición de escenarios de carga y la configuración de métricas detalladas. Esta herramienta también ofrece capacidades para generar reportes detallados y gráficos, proporcionando una visión integral del rendimiento del sistema y ayudando a identificar cuellos de botella y áreas de mejora. Su flexibilidad y extensibilidad la convierten en una opción ideal para evaluar la capacidad de respuesta y la estabilidad de aplicaciones en entornos de producción.
 
-#### 3.2.2. Escenarios de Prueba de Rendimiento
+#### 3.2.2 Escenarios de Prueba de Rendimiento
 
 <details open>
   <summary><b><i>Obtener detalles de Matricula</i></b></summary>
@@ -820,154 +509,22 @@ El siguiente informe presenta los resultados de las pruebas de rendimiento ejecu
 
 ---
 
-### 3.3. Pruebas de Seguridad
 
-#### 3.3.1. Herramientas y Tecnologías
+### 3.3 Pruebas de API
 
-**OWASP ZAP (Zed Attack Proxy)** es una herramienta de código abierto diseñada para realizar pruebas de seguridad en aplicaciones web. Desarrollada por el Open Web Application Security Project (OWASP), ZAP proporciona una amplia gama de funciones para identificar vulnerabilidades y evaluar la seguridad de aplicaciones durante el ciclo de desarrollo. Su interfaz intuitiva permite a los usuarios realizar escaneos automatizados, así como llevar a cabo pruebas manuales de seguridad, como la exploración de aplicaciones y la identificación de puntos débiles. ZAP es particularmente útil para detectar problemas de seguridad comunes, como inyecciones SQL, ataques de cross-site scripting (XSS) y configuraciones incorrectas. Además, ZAP ofrece soporte para integraciones con otras herramientas de desarrollo y pruebas, lo que facilita la inclusión de prácticas de seguridad en el proceso de desarrollo ágil. Su capacidad para generar reportes detallados ayuda a los equipos de desarrollo a abordar las vulnerabilidades de manera efectiva y mejorar la seguridad general de sus aplicaciones.
+#### 3.3.1 Herramientas y Tecnologías
 
-#### 3.3.2. Escenarios de Prueba de Seguridad
+Para llevar a cabo las pruebas de nuestra API, hemos utilizado una serie de herramientas y tecnologías clave que facilitan la evaluación exhaustiva y efectiva de las funcionalidades expuestas por la API. A continuación se describen las herramientas principales empleadas:
 
-```gherkin
-Background:
-    Given que el endpoint "http://localhost:8004" está accesible
-```
+- **Postman:** Esta herramienta es ampliamente utilizada para el diseño, prueba y documentación de APIs. Permite realizar solicitudes HTTP a los endpoints de la API, definir y gestionar colecciones de pruebas, y verificar respuestas con gran detalle. Postman también proporciona funcionalidades avanzadas como la ejecución de scripts pre y post solicitud, así como la integración con sistemas de CI/CD para automatizar las pruebas.
 
-<details open>
-  <summary><b><i>Escenario 1:</i></b> Verificación de encabezados de seguridad HTTP.</summary>
+- **Swagger:** Swagger, ahora conocido como OpenAPI, es una herramienta poderosa para documentar y probar APIs. Permite generar documentación interactiva que facilita la comprensión y el uso de los endpoints de la API. Con Swagger, es posible visualizar y probar los endpoints directamente desde la documentación, lo que ayuda a identificar problemas y validar el comportamiento de la API de manera eficiente.
 
-```gherkin
-Scenario: Verificación de encabezados de seguridad HTTP
-  Given el sitio web "http://localhost:8004" debe incluir varios encabezados de seguridad HTTP
-  When se realiza un análisis de encabezados HTTP
-  Then los encabezados esperados deben estar presentes, incluyendo "Strict-Transport-Security", "Content-Security-Policy", y "X-Content-Type-Options"
-```
+Estas herramientas y tecnologías no solo facilitan la creación de pruebas detalladas y la generación de documentación precisa, sino que también aseguran una integración continua y una experiencia de usuario consistente durante el ciclo de vida de desarrollo de la API.
 
-</details>
+![](resources/swagger.png)
 
-<details open>
-  <summary><b><i>Escenario 2:</i></b> Verificación de vulnerabilidades en bibliotecas JavaScript.</summary>
 
-```gherkin
-Scenario: Verificación de vulnerabilidades en bibliotecas JavaScript
-  Given el sitio web "http://localhost:8004" utiliza bibliotecas JavaScript de terceros
-  When se realiza un análisis de bibliotecas JavaScript
-  Then no se deben encontrar bibliotecas vulnerables, como aquellas indicadas por Retire.js
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 3:</i></b> Verificación de la configuración de cookies.</summary>
-
-```gherkin
-Scenario: Verificación de la configuración de cookies
-  Given el sitio web "http://localhost:8004" utiliza cookies para el manejo de sesiones
-  When se realiza un análisis de cookies
-  Then todas las cookies deben estar configuradas con las banderas adecuadas, incluyendo "HttpOnly" y "Secure"
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 4:</i></b> Verificación de la protección contra ataques XSS.</summary>
-
-```gherkin
-Scenario: Verificación de la protección contra ataques XSS
-  Given el sitio web "http://localhost:8004" permite la entrada de usuarios
-  When se realiza un análisis de entrada para detectar vulnerabilidades XSS
-  Then no se deben encontrar puntos de entrada vulnerables a ataques de cross-site scripting (XSS)
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 5:</i></b> Verificación de la política de seguridad de contenido (CSP).</summary>
-
-```gherkin
-Scenario: Verificación de la política de seguridad de contenido (CSP)
-  Given el sitio web "http://localhost:8004" debe tener una política de seguridad de contenido configurada
-  When se realiza un análisis de la política de seguridad de contenido
-  Then la política debe estar correctamente configurada y debe incluir directivas como "default-src" y "script-src"
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 6:</i></b> Verificación de la protección contra el clickjacking.</summary>
-
-```gherkin
-Scenario: Verificación de la protección contra el clickjacking
-  Given el sitio web "http://localhost:8004" debe protegerse contra ataques de clickjacking
-  When se realiza un análisis de encabezados HTTP
-  Then debe estar presente el encabezado "X-Frame-Options" con una configuración segura
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 7:</i></b> Verificación de redirecciones abiertas.</summary>
-
-```gherkin
-Scenario: Verificación de redirecciones abiertas
-  Given el sitio web "http://localhost:8004" debe manejar las redirecciones de forma segura
-  When se realiza un análisis para detectar redirecciones abiertas
-  Then no deben encontrarse vulnerabilidades de redirección abierta
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 8:</i></b> Verificación de exposición de información sensible.</summary>
-
-```gherkin
-Scenario: Verificación de exposición de información sensible
-  Given el sitio web "http://localhost:8004" debe proteger la información sensible
-  When se realiza un análisis para detectar la exposición de información sensible
-  Then no se debe encontrar información sensible expuesta en encabezados HTTP o mensajes de error
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 9:</i></b> Verificación de configuraciones de seguridad en la administración de sesiones.</summary>
-
-```gherkin
-Scenario: Verificación de configuraciones de seguridad en la administración de sesiones
-  Given el sitio web "http://localhost:8004" gestiona sesiones de usuario
-  When se realiza un análisis de la gestión de sesiones
-  Then la sesión debe estar protegida contra ataques como el secuestro de sesión y el manejo inseguro de IDs de sesión
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 10:</i></b> Verificación de la protección contra ataques de CSRF.</summary>
-
-```gherkin
-Scenario: Verificación de la protección contra ataques de CSRF
-  Given el sitio web "http://localhost:8004" debe protegerse contra ataques de falsificación de solicitudes entre sitios (CSRF)
-  When se realiza un análisis para detectar la protección contra CSRF
-  Then deben encontrarse y validarse tokens anti-CSRF en formularios y solicitudes
-```
-
-</details>
-
-<details open>
-  <summary><b><i>Escenario 11:</i></b> Verificación de vulnerabilidades de exposición de información.</summary>
-
-```gherkin
-Scenario: Verificación de vulnerabilidades de exposición de información
-  Given el sitio web "http://localhost:8004" debe manejar la exposición de información con cuidado
-  When se realiza un análisis para detectar la divulgación de información sensible
-  Then no deben encontrarse vulnerabilidades de divulgación de información, como mensajes de error o encabezados de respuesta que revelen detalles internos
-```
-
-</details>
-
-<p align="center">
-  <img src="resources/security_test.png" alt="Performance Test" />
-</p>
 
 ## 4. Referencias
 
