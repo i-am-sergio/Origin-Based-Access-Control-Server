@@ -3395,19 +3395,19 @@
     ]
   },
   "packageFolders": {
-    "/home/shinji/.nuget/packages/": {}
+    "C:\\Users\\sergi\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/src/src.csproj",
+      "projectUniqueName": "C:\\Users\\sergi\\Desktop\\Origin-Based-Access-Control-Server\\src\\src.csproj",
       "projectName": "src",
-      "projectPath": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/src/src.csproj",
-      "packagesPath": "/home/shinji/.nuget/packages/",
-      "outputPath": "/home/shinji/Escritorio/Projects/Origin-Based-Access-Control-Server/src/obj/",
+      "projectPath": "C:\\Users\\sergi\\Desktop\\Origin-Based-Access-Control-Server\\src\\src.csproj",
+      "packagesPath": "C:\\Users\\sergi\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\sergi\\Desktop\\Origin-Based-Access-Control-Server\\src\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/shinji/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\sergi\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -3469,7 +3469,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/8.0.108/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
